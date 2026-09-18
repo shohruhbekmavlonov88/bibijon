@@ -1,3 +1,84 @@
+(function(){
+  'use strict';
+
+  const TEXT = {
+    moodGood: "Ajoyib! Davom etamiz ❤️",
+    moodBad: "Nega? Unda ko‘taramiz ❤️",
+    memory1: "Sen bilan zakovat arenada ilk tanishuvimiz",
+    memory2: "Juda ko‘p urushsak ham yarashib ketishimiz",
+    memory3: "Har kuni bir-birimizga bo‘lgan mehr va iliq suhbatlar",
+    memory4: "Bir-birimizni o‘ylab uyquga ketish",
+    letter: "Bibim, bilaman sizni ko‘p ko‘nglingizni og‘ritdim. Bilaman, mendan judayam xafasiz. Bilaman, juda o‘ylab qiynalyapsiz. Sizga yetarlicha mehr berolmadim. Qiyin vaziyatingizda yoningizda bo‘lolmadim. Sizni tushunmadim. Lekin bilib qo‘ying sizni judayam qattiq sevaman. Siz mening borlig‘im, yagonamsiz. Doim sizni o‘ylayman. Doim sizni deyman. Mening go‘zalim, mening malikam, mening gul g‘uncham, mening pompaloq‘im, mening arazchim, mening erkatoyim faqat va faqat meniki. Dunyolarga alishmayman bu go‘zallikni. Unutmang, sizni judayam judayam judayam qattiq sevaman ❤️"
+  };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function goTo(id){
+    document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target){ target.classList.add('active'); window.scrollTo(0,0); }
+  }
+
+  document.addEventListener('click', function(e){
+    const nextBtn = e.target.closest('[data-next]');
+    if(nextBtn){ goTo(nextBtn.getAttribute('data-next')); }
+  });
+
+  // ---- PARTICLES ----
+  function spawnParticle(){
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = '❤';
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.fontSize = (10 + Math.random()*14) + 'px';
+    const dur = 8 + Math.random()*10;
+    el.style.animationDuration = dur + 's';
+    document.getElementById('particles').appendChild(el);
+    setTimeout(()=> el.remove(), dur*1000 + 500);
+  }
+  if(!reduceMotion){
+    setInterval(spawnParticle, 900);
+    for(let i=0;i<6;i++) setTimeout(spawnParticle, i*300);
+  }
+
+  // ---- SAHNA 2: KAYFIYAT (2 variant) ----
+  const moodBtns = document.querySelectorAll('.mood-btn');
+  const moodResponse = document.getElementById('moodResponse');
+  const scene2Next = document.getElementById('scene2Next');
+  moodBtns.forEach(btn=>{
+    btn.addEventListener('click', function(){
+      moodBtns.forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const mood = btn.getAttribute('data-mood');
+      moodResponse.textContent = mood === 'good' ? TEXT.moodGood : TEXT.moodBad;
+      scene2Next.classList.remove('hidden');
+    });
+  });
+
+  // ---- SAHNA 3: XOTIRALAR ----
+  const memoryCards = document.querySelectorAll('.memory-card');
+  const memoryResponse = document.getElementById('memoryResponse');
+  memoryCards.forEach(card=>{
+    card.addEventListener('click', function(){
+      memoryCards.forEach(c=>c.classList.remove('opened'));
+      card.classList.add('opened');
+      const idx = card.getAttribute('data-memory');
+      const map = { '1': TEXT.memory1, '2': TEXT.memory2, '3': TEXT.memory3, '4': TEXT.memory4 };
+      memoryResponse.textContent = map[idx];
+    });
+  });
+
+  // ---- SAHNA 4: XAT ----
+  const envelopeBtn = document.getElementById('envelopeBtn');
+  const letterBox = document.getElementById('letterBox');
+  const letterText = document.getElementById('letterText');
+  const scene4Next = document.getElementById('scene4Next');
+  let letterOpened = false;
+
+  envelopeBtn.addEventListener('click', function(){
+    if(letterOpened) return;
+    letterOpened = true;
+    envelopeBtn.classList.add('hidden');
     letterBox.classList.remove('hidden');
     typewrite(TEXT.letter, letterText, function(){
       scene4Next.classList.remove('hidden');
